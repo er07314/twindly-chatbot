@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Twindly Chatbot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      background-color: #800020;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 1rem;
+    }
+    #chat {
+      flex: 1;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1rem;
+      background: white;
+    }
+    .message {
+      margin-bottom: 0.75rem;
+    }
+    .user {
+      font-weight: bold;
+      color: #800020;
+    }
+    .bot {
+      color: #444;
+    }
+    #inputContainer {
+      display: flex;
+      margin-top: 1rem;
+    }
+    #userInput {
+      flex: 1;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 8px 0 0 8px;
+    }
+    #sendBtn {
+      padding: 0.75rem 1rem;
+      border: none;
+      background-color: #800020;
+      color: white;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Twindly Chatbot</h1>
+    <p>Ask me anything about Twindly Bridge!</p>
+  </header>
+  <main>
+    <div id="chat"></div>
+    <div id="inputContainer">
+      <input type="text" id="userInput" placeholder="Type your question here..." />
+      <button id="sendBtn">Send</button>
+    </div>
+  </main>
+  <script>
+    const chat = document.getElementById('chat');
+    const input = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+
+    async function sendMessage() {
+      const message = input.value.trim();
+      if (!message) return;
+
+      appendMessage('You', message, 'user');
+      input.value = '';
+
+      try {
+        const response = await fetch('/.netlify/functions/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message })
+        });
+
+        const data = await response.json();
+        const reply = data.choices[0].message.content;
+        appendMessage('Twindly Bot', reply, 'bot');
+      } catch (error) {
+        appendMessage('Twindly Bot', 'Oops! Something went wrong. Please try again later.', 'bot');
+        console.error(error);
+      }
+    }
+
+    function appendMessage(sender, text, type) {
+      const msg = document.createElement('div');
+      msg.classList.add('message');
+      msg.innerHTML = `<span class="${type}">${sender}:</span> ${text}`;
+      chat.appendChild(msg);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+  </script>
+</body>
+</html>
