@@ -1,6 +1,8 @@
 const fetch = require("node-fetch");
 
 exports.handler = async function (event, context) {
+  console.log("EVENT BODY:", event.body);
+  
   if (event.headers['content-type'] !== 'application/json') {
     return {
       statusCode: 400,
