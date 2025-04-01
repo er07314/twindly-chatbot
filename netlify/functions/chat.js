@@ -1,8 +1,14 @@
 const fetch = require("node-fetch");
 
 exports.handler = async function (event, context) {
-  let message;
+  if (event.headers['content-type'] !== 'application/json') {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Content-Type must be application/json" }),
+    };
+  }
 
+  let message;
   try {
     const body = JSON.parse(event.body);
     message = body.message;
