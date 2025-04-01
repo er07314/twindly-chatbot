@@ -28,7 +28,7 @@ exports.handler = async function (event, context) {
       "Authorization": "Bearer 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"
     },
     body: JSON.stringify({
-      model: "gpt-4",
+      model: "gpt-3.5-turbo",
       messages: [
         {
           role: "system",
