@@ -21,31 +21,42 @@ exports.handler = async function (event, context) {
     };
   }
 
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer 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"
-    },
-    body: JSON.stringify({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content: "You are a friendly and helpful assistant for Twindly Bridge Charter School. Only use info from twindlybridge.us, matsuk12.us, or education.alaska.gov."
-        },
-        {
-          role: "user",
-          content: message
-        }
-      ]
-    }),
-  });
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer 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"
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content: "You are a friendly and helpful assistant for Twindly Bridge Charter School. Only use info from twindlybridge.us, matsuk12.us, or education.alaska.gov."
+          },
+          {
+            role: "user",
+            content: message
+          }
+        ]
+      }),
+    });
 
-  const data = await response.json();
+    const data = await response.json();
+    console.log("OPENAI RESPONSE:", JSON.stringify(data, null, 2)); // 👈 Log full response
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify(data),
-  };
+    return {
+      statusCode: 200,
+      body: JSON.stringify(data),
+    };
+
+  } catch (error) {
+    console.error("ERROR CALLING OPENAI:", error); // 👈 Log any fetch errors
+
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: "Failed to fetch from OpenAI" }),
+    };
+  }
 };
