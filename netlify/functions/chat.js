@@ -2,7 +2,7 @@ const fetch = require("node-fetch");
 
 exports.handler = async function (event, context) {
   console.log("EVENT BODY:", event.body);
-  
+
   if (event.headers['content-type'] !== 'application/json') {
     return {
       statusCode: 400,
@@ -26,17 +26,24 @@ exports.handler = async function (event, context) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
-
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}` // 🔐 using env variable
       },
       body: JSON.stringify({
-        model: "gpt-4-turbo",
-
+        model: "gpt-4-turbo", // 🎯 upgrade if you have access; else use gpt-3.5-turbo
+        temperature: 0.85,    // 🧠 more detailed, confident answers
         messages: [
           {
             role: "system",
-            content: "You are a friendly and helpful assistant for Twindly Bridge Charter School. You may use and refer to information from twindlybridge.us, matsuk12.us, or education.alaska.gov. The staff directory is available on the school website, so you may freely share staff names, phone numbers, and email addresses if asked."
+            content: `You are a friendly, helpful, and knowledgeable assistant for Twindly Bridge Charter School. Your tone should reflect Twindly's family-oriented, supportive atmosphere.
 
+Only use information from the following sources:
+- twindlybridge.us
+- matsuk12.us
+- education.alaska.gov
+
+You may share public information such as staff contact details, phone numbers, and emails if they are listed on the official Twindly website. Do not say “I can't provide that” for anything already public.
+
+You can also provide guidance about ILPs, Jumpstart, activities, and advisor contacts. If you’re unsure, kindly direct the user to the staff directory or calendar page. Be brief, helpful, and warm in tone.`
           },
           {
             role: "user",
@@ -47,7 +54,7 @@ exports.handler = async function (event, context) {
     });
 
     const data = await response.json();
-    console.log("OPENAI RESPONSE:", JSON.stringify(data, null, 2)); // 👈 Log full response
+    console.log("OPENAI RESPONSE:", JSON.stringify(data, null, 2));
 
     return {
       statusCode: 200,
@@ -55,8 +62,7 @@ exports.handler = async function (event, context) {
     };
 
   } catch (error) {
-    console.error("ERROR CALLING OPENAI:", error); // 👈 Log any fetch errors
-
+    console.error("ERROR CALLING OPENAI:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Failed to fetch from OpenAI" }),
